@@ -1,0 +1,78 @@
+name: Bootstrap Andaman and Subatomic
+permissions:
+  contents: read
+on:
+  workflow_dispatch:
+
+jobs:
+  bootstrap:
+    strategy:
+      matrix:
+        version: ["10"]
+        arch: ["x86_64", "aarch64"]
+      fail-fast: true
+    runs-on: ${{ matrix.arch == 'aarch64' && 'ubuntu-22.04-arm' || 'ubuntu-22.04' }}
+    container:
+      image: quay.io/almalinuxorg/almalinux:${{ matrix.version }}
+      options: --cap-add=SYS_ADMIN --privileged
+    steps:
+
+      - name: Install repositories
+        run: |
+          dnf install -y 'dnf-command(config-manager)'
+          dnf config-manager --set-enabled crb
+          dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${{ matrix.version }}.noarch.rpm
+          dnf install -y mock wget git-core openssl-devel cargo podman fuse-overlayfs rpm-build mock gzip
+
+      - uses: actions/checkout@v6
+        with:
+          ref: el${{ matrix.version }}
+          fetch-depth: 1
+
+      - name: Install dependencies
+        run: dnf builddep -y anda/{terra/{mock-configs,srpm-macros},tools/buildsys/subatomic}/*.spec
+
+      - name: Install Anda
+        run: cargo install anda
+
+      - name: Build terra-mock-configs
+        run: |
+          echo "PATH=$PATH:/github/home/.cargo/bin" >> $GITHUB_ENV
+          export PATH=$PATH:/github/home/.cargo/bin
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          anda build -D "vendor Terra" -rrpmbuild anda/terra/mock-configs/pkg
+      - name: Install terra-mock-configs
+        run: dnf install -y anda-build/rpm/rpms/terra-mock-configs*.rpm
+
+      - name: Build anda-srpm-macros
+        run: anda build -D "vendor Terra" -rrpmbuild anda/terra/srpm-macros/pkg
+
+      - name: Build terra-release
+        run: anda build -D "vendor Terra" -rrpmbuild anda/terra/release/pkg
+
+      - name: Build terra-appstream-helper
+        run: anda build -D "vendor Terra" -rrpmbuild anda/terra/appstream-helper/pkg
+
+      - name: Build Subatomic
+        run: anda build -D "vendor Terra" -rrpmbuild anda/tools/buildsys/subatomic/pkg
+      - name: Install Subatomic and anda-srpm-macros
+        run: dnf install -y ./anda-build/rpm/rpms/{subatomic,anda-srpm-macros}-*.rpm
+
+      - name: Install Build Dependencies for Andaman
+        run: dnf builddep -y anda/tools/buildsys/anda/*.spec
+      - name: Build Andaman
+        run: anda build anda/tools/buildsys/anda/pkg --rpm-builder=rpmbuild
+
+      - name: Upload packages to subatomic
+        run: |
+          subatomic-cli upload --prune \
+            --server https://subatomic.fyralabs.com \
+            --token ${{ secrets.SUBATOMIC_TOKEN }} \
+            terrael${{ matrix.version }} anda-build/rpm/rpms/*
+
+      - name: Upload source packages to subatomic
+        run: |
+          subatomic-cli upload --prune \
+            --server https://subatomic.fyralabs.com \
+            --token ${{ secrets.SUBATOMIC_TOKEN }} \
+            terrael${{ matrix.version }}-source anda-build/rpm/srpm/*
