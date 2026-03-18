@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Terra EL Sources
 
 Terra is a rolling-release Fedora repository for all the software you need.

@@ -18,6 +18,11 @@ on:
         required: false
         type: string
         default: ""
+      bust_cache:
+        description: "Whether to bust the cache"
+        required: false
+        type: boolean
+        default: false
   workflow_dispatch:
     inputs:
       packages:
@@ -50,6 +55,18 @@ jobs:
       - name: Set up git repository
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
+      - name: Configure sccache
+        id: sccache
+        if: ${{ !contains(matrix.pkg.labels.sccache, '0') }}
+        uses: actions/github-script@v8
+        env:
+          SCCACHE_GHA_VERSION: ${{ matrix.version }}-${{ matrix.pkg.arch }}-${{ matrix.pkg.pkg }}
+          SCCACHE_GHA_CACHE_FROM: ${{ matrix.version }}-${{ matrix.pkg.arch }}-${{ matrix.pkg.pkg }}
+        with:
+          script: |
+            const script = require('./.github/scripts/configure-sccache.js')
+            await script({github, context, core, exec})
+
       - name: CI Setup Script
         if: ${{ !contains(matrix.pkg.labels, 'mock') }}
         run: |
@@ -65,7 +82,15 @@ jobs:
           dnf builddep -y ${dir}/*.spec
 
       - name: Build with Andaman
-        run: anda build -D "vendor Terra" ${{ matrix.pkg.pkg }} -c terra-el${{ matrix.version }}-${{ matrix.pkg.arch }} ${{ !matrix.pkg.labels.mock == '1' && '-rrpmbuild' || '' }}
+        run: anda build -D "vendor Terra" -D "__python %{__python3}" ${{ matrix.pkg.pkg }} -c terra-el${{ matrix.version }}-${{ matrix.pkg.arch }} ${{ !matrix.pkg.labels.mock == '1' && '-rrpmbuild' || '' }}
+
+      - name: Report Cache Summary
+        if: steps.sccache.outcome == 'success'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const script = require('./.github/scripts/sccache-stats.js')
+            await script({github, context, core, exec})
 
       - name: Generating artifact name
         id: art
@@ -99,8 +124,8 @@ jobs:
             terrael${{ matrix.version }}-source anda-build/rpm/srpm/*
 
       - name: Notify Madoguchi (Success)
-        if: success()
-        run: ./.github/workflows/mg.sh true ${{matrix.pkg.pkg}} el${{matrix.version}} ${{matrix.pkg.arch}} ${{github.run_id}} ${{secrets.MADOGUCHI_JWT}} $GITHUB_SHA
+        if: inputs.publish && success()
+        run: ./.github/workflows/mg.sh true "${{matrix.pkg.pkg}}" "${{matrix.version}}" "${{matrix.pkg.arch}}" "${{github.run_id}}" "${{secrets.MADOGUCHI_JWT}}" "$GITHUB_SHA"
       - name: Notify Madoguchi (Failure)
         if: inputs.publish && (cancelled() || failure())
-        run: ./.github/workflows/mg.sh false ${{matrix.pkg.pkg}} el${{matrix.version}} ${{matrix.pkg.arch}} ${{github.run_id}} ${{secrets.MADOGUCHI_JWT}} $GITHUB_SHA
+        run: ./.github/workflows/mg.sh false "${{matrix.pkg.pkg}}" "${{matrix.version}}" "${{matrix.pkg.arch}}" "${{github.run_id}}" "${{secrets.MADOGUCHI_JWT}}" "$GITHUB_SHA"
