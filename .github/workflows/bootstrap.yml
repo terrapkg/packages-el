@@ -44,6 +44,9 @@ jobs:
       - name: Install terra-mock-configs
         run: dnf install -y anda-build/rpm/rpms/terra-mock-configs*.rpm
 
+      - name: Build dnf5
+        run: anda build -D "vendor Terra" anda/tools/dnf5/pkg -c terra-el10-${{ matrix.arch }}
+
       - name: Build anda-srpm-macros
         run: anda build -D "vendor Terra" -rrpmbuild anda/terra/srpm-macros/pkg
 
