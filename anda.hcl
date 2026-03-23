@@ -1,5 +1,5 @@
 config {
-	strip_prefix = "eel/"
+	strip_prefix = "anda/"
 	strip_suffix = "/pkg"
 }
 
