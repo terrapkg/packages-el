@@ -57,7 +57,7 @@ jobs:
           anda build -D "vendor Terra" -rrpmbuild anda/terra/gpg-keys/pkg
 
       - name: Install terra-mock-configs
-        run: dnf install -y anda-build/rpm/rpms/terra-mock-configs*.rpm
+        run: dnf install -y anda-build/rpm/rpms/terra-{mock-configs,gpg-keys}*.rpm
 
       - name: Build terra-release
         run: anda build -D "vendor Terra" -rrpmbuild anda/terra/release/pkg
