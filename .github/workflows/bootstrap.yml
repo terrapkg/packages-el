@@ -29,11 +29,21 @@ jobs:
           ref: el${{ matrix.version }}
           fetch-depth: 1
 
-      - name: Install dependencies
-        run: dnf builddep -y anda/{terra/{mock-configs,srpm-macros},tools/buildsys/subatomic}/*.spec
+      - name: Build & Install anda-srpm-macros
+        run: |
+          mkdir -p anda-build/rpm/rpms
+          rpmbuild -bb anda/terra/srpm-macros/*.spec --undefine=_disable_source_fetch -D "_sourcedir $(pwd)/anda/terra/srpm-macros/" -D "_rpmdir $(pwd)/anda-build/rpm/rpms/"
+          mv ./anda-build/rpm/rpms/*/anda-*.rpm ./anda-build/rpm/rpms/
+          dnf5 install -y ./anda-build/rpm/rpms/anda-*.rpm
+
+      - name: Install build dependencies
+        run: dnf5 builddep -y anda/terra/{mock-configs,srpm-macros,gpg-keys,appstream-helper}/*.spec anda/tools/buildsys/{anda,subatomic}/*.spec
 
       - name: Install Anda
-        run: cargo install anda
+        run: |
+          rpmbuild -bb anda/tools/buildsys/anda/*.spec --undefine=_disable_source_fetch -D "_sourcedir $(pwd)/anda/tools/buildsys/anda/" -D "_rpmdir $(pwd)/anda-build/rpm/rpms/"
+          mv ./anda-build/rpm/rpms/*/anda-*.rpm ./anda-build/rpm/rpms/
+          dnf5 install -y ./anda-build/rpm/rpms/anda-*.rpm
 
       - name: Build terra-mock-configs
         run: |
@@ -42,35 +52,26 @@ jobs:
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           anda build -D "vendor Terra" -rrpmbuild anda/terra/mock-configs/pkg
 
-
       - name: Build terra-gpg-keys
         run: |
           anda build -D "vendor Terra" -rrpmbuild anda/terra/gpg-keys/pkg
 
       - name: Install terra-mock-configs
-        run: dnf install -y anda-build/rpm/rpms/*.rpm
-
-      - name: Build dnf5
-        run: anda build -D "vendor Terra" anda/tools/dnf5/pkg -c terra-el10-${{ matrix.arch }}
-
-      - name: Build anda-srpm-macros
-        run: anda build -D "vendor Terra" -rrpmbuild anda/terra/srpm-macros/pkg
+        run: dnf5 install -y anda-build/rpm/rpms/terra-mock-configs*.rpm
 
       - name: Build terra-release
         run: anda build -D "vendor Terra" -rrpmbuild anda/terra/release/pkg
 
       - name: Build terra-appstream-helper
-        run: anda build -D "vendor Terra" -rrpmbuild anda/terra/appstream-helper/pkg
+        run: anda build -D "vendor Terra" -D "__python %{__python3}" -rrpmbuild anda/terra/appstream-helper/pkg
 
       - name: Build Subatomic
         run: anda build -D "vendor Terra" -rrpmbuild anda/tools/buildsys/subatomic/pkg
-      - name: Install Subatomic and anda-srpm-macros
-        run: dnf install -y ./anda-build/rpm/rpms/{subatomic,anda-srpm-macros}-*.rpm
+      - name: Install Subatomic
+        run: dnf5 install -y ./anda-build/rpm/rpms/subatomic-*.rpm
 
-      - name: Install Build Dependencies for Andaman
-        run: dnf builddep -y anda/tools/buildsys/anda/*.spec
-      - name: Build Andaman
-        run: anda build anda/tools/buildsys/anda/pkg --rpm-builder=rpmbuild
+      - name: Tidy up output directory
+        run: rmdir anda-build/rpm/rpms/{noarch,aarch64,x86_64} | true
 
       - name: Upload packages to subatomic
         run: |
