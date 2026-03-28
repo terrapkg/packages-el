@@ -45,15 +45,16 @@ jobs:
           mv ./anda-build/rpm/rpms/*/anda-*.rpm ./anda-build/rpm/rpms/
           dnf install -y ./anda-build/rpm/rpms/anda-*.rpm
 
-      - name: Build dnf5
-        run: anda build -D "vendor Terra" anda/tools/dnf5/pkg -c terra-el10-${{ matrix.arch }}
-
-      - name: Build terra-mock-configs
+      - name: Install terra-mock-configs
         run: |
           echo "PATH=$PATH:/github/home/.cargo/bin" >> $GITHUB_ENV
           export PATH=$PATH:/github/home/.cargo/bin
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           anda build -D "vendor Terra" -rrpmbuild anda/terra/mock-configs/pkg
+          dnf install -y ./anda-build/rpm/rpms/{terra-mock-configs,*gpg}*.rpm
+
+      - name: Build dnf5
+        run: anda build -D "vendor Terra" anda/tools/dnf5/pkg -c terra-el10-${{ matrix.arch }}
 
       - name: Build terra-gpg-keys
         run: |
