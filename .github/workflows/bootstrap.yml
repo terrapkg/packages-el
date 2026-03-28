@@ -37,13 +37,16 @@ jobs:
           dnf install -y ./anda-build/rpm/rpms/anda-*.rpm
 
       - name: Install build dependencies
-        run: dnf builddep -y anda/terra/{mock-configs,srpm-macros,gpg-keys,appstream-helper}/*.spec anda/tools/buildsys/{anda,subatomic}/*.spec
+        run: dnf builddep -y anda/terra/{mock-configs,srpm-macros,gpg-keys,appstream-helper}/*.spec anda/tools/buildsys/{anda,subatomic}/*.spec anda/tools/dnf5/*.spec
 
       - name: Install Anda
         run: |
           rpmbuild -bb anda/tools/buildsys/anda/*.spec --undefine=_disable_source_fetch -D "_sourcedir $(pwd)/anda/tools/buildsys/anda/" -D "_rpmdir $(pwd)/anda-build/rpm/rpms/"
           mv ./anda-build/rpm/rpms/*/anda-*.rpm ./anda-build/rpm/rpms/
           dnf install -y ./anda-build/rpm/rpms/anda-*.rpm
+
+      - name: Build dnf5
+        run: anda build -D "vendor Terra" anda/tools/dnf5/pkg -c terra-el10-${{ matrix.arch }}
 
       - name: Build terra-mock-configs
         run: |
