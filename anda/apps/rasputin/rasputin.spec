@@ -1,10 +1,10 @@
-%global commit 605d9dd8c825b650deeaa614e1b83e8dbb41e87d
-%global commit_date 20260128
+%global commit 26d1e16e08cb66e8ec561d0a016ffddfc3c37043
+%global commit_date 20260829
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 Name:           rasputin
 Version:        0~%commit_date.git~%shortcommit
-Release:        1%?dist
+Release:        1%{?dist}
 Summary:        Mouse and keyboard settings for Raspberry Pi Desktop
 License:        BSD-3-Clause
 URL:            https://github.com/raspberrypi-ui/rasputin
