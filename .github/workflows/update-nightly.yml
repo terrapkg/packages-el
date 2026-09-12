@@ -8,7 +8,7 @@ on:
 
 jobs:
   autoupdate:
-    runs-on: ubuntu-24.04-arm
+    runs-on: arc-runner-set
     container:
       image: ghcr.io/terrapkg/builder:el10
       options: --cap-add=SYS_ADMIN --privileged

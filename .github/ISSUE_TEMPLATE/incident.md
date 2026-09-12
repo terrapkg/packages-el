@@ -1,10 +1,6 @@
 ---
 name: Incident Report
-<<<<<<< HEAD
 about: Report an issue with Terra EL itself
-=======
-about: Report an issue with Terra itself
->>>>>>> terra
 title: '[INCIDENT] '
 labels: incident
 assignees: ['madonuko', 'korewaChino', 'lleyton']

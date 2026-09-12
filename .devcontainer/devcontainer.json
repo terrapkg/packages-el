@@ -1,17 +1,16 @@
 {
   "name": "Terra Devcontainer",
-  "image": "ghcr.io/terrapkg/builder:frawhide",
-  "runArgs": ["--privileged"],
+  "image": "ghcr.io/terrapkg/builder:el10",
+  "runArgs": [
+    "--privileged"
+  ],
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {}
   },
   "customizations": {
     "vscode": {
       "extensions": [
-        "rhaiscript.vscode-rhai",
-        "1dot75cm.rpmspec",
-        "hashicorp.hcl",
-        "redhat.vscode-xml"
+        "rhaiscript.vscode-rhai"
       ]
     }
   },
