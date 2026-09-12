@@ -1,7 +1,14 @@
 {
   "name": "Terra Devcontainer",
+<<<<<<< HEAD
   "image": "ghcr.io/terrapkg/builder:frawhide",
   "runArgs": ["--privileged"],
+=======
+  "image": "ghcr.io/terrapkg/builder:el10",
+  "runArgs": [
+    "--privileged"
+  ],
+>>>>>>> packages-source/el10
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {}
   },
@@ -17,4 +24,8 @@
   },
   "remoteUser": "vscode",
   "onCreateCommand": "sudo usermod -a -G mock vscode"
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> packages-source/el10

@@ -4,7 +4,7 @@ Version:    %{?fedora:%{fedora}}%{?rhel:%{rhel}}
 # The dist number is the version here, it is intentionally not repeated in the release
 %global dist %nil
 
-Release:    2%?dist
+Release:    1%{?dist}
 Summary:    A package to obsolete retired packages, based on Fedora's equivalent package
 
 License:    LicenseRef-Fedora-Public-Domain
@@ -123,33 +123,15 @@ Packager:   Terra Packaging Team <terra@fyralabs.com>
 %obsolete_ticket https://github.com/terrapkg/packages/issues/991
 %obsolete iosevka-fusion-fonts 25.1.1-2
 
-%obsolete_ticket https://github.com/terrapkg/packages/pull/3138
-%obsolete terra-sddm 0.21.0-6
-%obsolete terra-rgbds 0.9.0-3
-%obsolete terra-libplacebo 7.349.0-3
-%obsolete terra-libplacebo-devel 7.349.0-3
-%obsolete terra-wl-clipboard 2.2.1-2
-%obsolete terra-maturin 1.8.1-3
-%obsolete terra-libindicator 16.10.0-3
-%obsolete terra-libindicator-devel 16.10.0-3
-%obsolete terra-libindicator-gtk3 16.10.0-3
-%obsolete terra-libindicator-gtk3-devel 16.10.0-3
-%obsolete terra-blueprint-compiler 0.16.0-3
-%obsolete nushell 0.101.0-3
-%obsolete uutils-coreutils-util-linux 0.0.29-2
-%obsolete uutils-coreutils-util-linux-replace 0.0.29-2
-# pantheon packages only packaged in terra
-%obsolete elementary-appcenter 7.4.0-3
-%obsolete switchboard-plug-datetime 8.0.0-2
-%obsolete switchboard-plug-locale 8.0.0-2
-%obsolete switchboard-plug-parental-controls 8.0.0-2
-%obsolete switchboard-plug-power 8.0.0-2
-%obsolete switchboard-plug-security-privacy 8.0.0-2
-%obsolete switchboard-plug-useraccounts 8.0.0-2
-%obsolete switchboard-plug-wacom 8.0.0-2
 
 %obsolete_ticket https://github.com/terrapkg/packages/pull/7098
 %obsolete terra-surface-dtx-daemon v0.3.10~1-5
+
+%obsolete_ticket https://github.com/terrapkg/packages/pull/12665
+%obsolete supergfxctl 5.2.7-3
+
+%obsolete_ticket https://github.com/terrapkg/packages/pull/12665
+%obsolete gnome-shell-extension-gpu-switcher-supergfxctl 11^20250925.1de26db-4
 
 %obsolete_ticket https://github.com/terrapkg/packages/pull/7521
 %obsolete x264-bash-completion 0.165-18.20250609gitb35605ac
@@ -161,6 +143,9 @@ Packager:   Terra Packaging Team <terra@fyralabs.com>
 
 %obsolete_ticket https://github.com/terrapkg/packages/pull/7503
 %obsolete zig-master-bootstrap 0.16.0~dev.1484+d0ba6642b-3
+
+%obsolete_ticket https://github.com/terrapkg/packages/pull/14943
+%obsolete dkms-mediatek-mt7927 2.13.1-2
 
 %description
 Currently obsoleted packages:

@@ -1,8 +1,7 @@
 project pkg {
-    arches = ["x86_64", "aarch64", "i386"]
+    arches = ["x86_64", "aarch64"]
     rpm {
         spec = "gstreamer1-plugin-libav.spec"
-        extra_repos = ["https://repos.fyralabs.com/terrarawhide-multimedia"]
     }
     labels {
         subrepo = "multimedia"
