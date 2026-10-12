@@ -86,7 +86,7 @@ jobs:
 
       - name: Report Cache Summary
         if: steps.sccache.outcome == 'success'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const script = require('./.github/scripts/sccache-stats.js')
