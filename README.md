@@ -21,7 +21,7 @@ Only EL10 is supported. Not all packages available in Terra are available in Ter
 Terra EL requires the EPEL repos, which may be installed with:
 
 ```bash
-sudo dnf install 'https://dl.fedoraproject.org/pub/epel/epel-release-latest-$releasever.noarch.rpm'
+sudo dnf install epel-release
 ```
 
 And Terra EL itself can be installed with:

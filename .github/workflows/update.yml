@@ -10,11 +10,11 @@ jobs:
   autoupdate:
     runs-on: arc-runner-set
     container:
-      image: ghcr.io/terrapkg/builder:el10
+      image: ghcr.io/terrapkg/el-builder:el10
       options: --cap-add=SYS_ADMIN --privileged
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           ssh-key: ${{ secrets.SSH_AUTHENTICATION_KEY }}
